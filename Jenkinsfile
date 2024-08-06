@@ -32,10 +32,17 @@ error "Pipeline aborted due to quality gate failure: ${qg.status}"
 }
 }
 stage('Docker Build') {
-       agent any
        steps {
         sh 'docker build -t william438/spring-petclinic:latest .'
       }
     }
+stage('Docker Push') {
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
+          sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}"
+          sh 'docker push william438/spring-petclinic:latest'
+        }
+      }
+}
 }
 }
